@@ -25,6 +25,11 @@ public class MyView extends View {
     private int mCenterX;//圆的中心坐标x
     private int mCenterY;//圆的中心坐标y
     private int mCircleRadius = 150;//圆的半径
+    private int littleRadius = 50;//小圆弧的半径
+    private int paddinngTop = 20;
+    private int paddinngBottom = 20;
+    private int paddinngleft = 20;
+    private int paddinngRight = 20;
     Paint mPaint;
     Path mPath;
 
@@ -34,7 +39,7 @@ public class MyView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.WHITE);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(0.01f);
+        mPaint.setStrokeWidth(2f);
         mPath = new Path();
     }
 
@@ -76,7 +81,7 @@ public class MyView extends View {
         mWidth = width;
         mHeight = height;
         //保存测量宽度和测量高度
-        setMeasuredDimension(width + 10, height + 100);
+        setMeasuredDimension(width, height);
     }
 
 
@@ -88,17 +93,28 @@ public class MyView extends View {
         Log.d(TAG, "onDraw获取的高的尺寸:" + height);
         Log.d(TAG, "onDraw获取的宽的尺寸:" + width);
         int halfWidth = width / 2;
-        int startPoint = halfWidth - 100;
-        int endPoint = halfWidth + 100;
+
 
         drawCircle(canvas);
-        mPath.lineTo(0, 0 + 50);
-        mPath.lineTo(0, mHeight + 50);
-        mPath.lineTo(width, mHeight + 50);
-        mPath.lineTo(width, 0 + 50);
-        mPath.lineTo(halfWidth + mCircleRadius, 0 + 50);
+        mPath.lineTo(paddinngleft + littleRadius, paddinngTop);
 
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mPath.lineTo(0 + paddinngleft, 0 + paddinngTop + littleRadius);
+        mPath.lineTo(0 + paddinngleft, mHeight - paddinngBottom - littleRadius);
+
+        mPath.lineTo(0 + paddinngleft + littleRadius, mHeight - paddinngBottom);
+        mPath.lineTo(width - paddinngRight, mHeight - paddinngBottom);
+        mPath.lineTo(width - paddinngRight, 0 + paddinngTop);
+        mPath.lineTo(halfWidth + mCircleRadius, 0 + paddinngTop);
+        drawTopLeftArc();
+        drawBottomLeftArc();
+
+//        drawBottomLeftArc();
+//        drawBottomRightArc();
+//        drawTopRightArc();
+
+        mPaint.setDither(true);
+        mPaint.setAlpha(125);
+        mPaint.setStyle(Paint.Style.FILL);
         mPaint.setShadowLayer(30, 0, 0, Color.GRAY);
         canvas.drawPath(mPath, mPaint);
 
@@ -128,6 +144,63 @@ public class MyView extends View {
 //        canvas.drawPath(mPath, mPaint);
     }
 
+    public void drawTopLeftArc() {
+        List<PointF> pointDatas = new ArrayList<>();
+        List<PointF> pointControlls = new ArrayList<>();
+
+        pointDatas.add(new PointF(paddinngleft, paddinngTop + littleRadius));
+        pointDatas.add(new PointF(paddinngleft + littleRadius, paddinngTop));
+
+        pointControlls.add(new PointF(paddinngleft, paddinngTop + littleRadius / 2));
+        pointControlls.add(new PointF(paddinngleft + littleRadius / 2, paddinngTop));
+
+        mPath.moveTo(pointDatas.get(1).x, pointDatas.get(1).y);
+        mPath.cubicTo(pointControlls.get(1).x, pointControlls.get(1).y, pointControlls.get(0).x, pointControlls.get(0).y, pointDatas.get(0).x, pointDatas.get(0).y);
+    }
+
+    public void drawBottomLeftArc() {
+        List<PointF> pointDatas = new ArrayList<>();
+        List<PointF> pointControlls = new ArrayList<>();
+
+        pointDatas.add(new PointF(paddinngleft, mHeight - paddinngBottom - littleRadius));
+        pointDatas.add(new PointF(paddinngleft + littleRadius, mHeight - paddinngBottom));
+
+        pointControlls.add(new PointF(paddinngleft, mHeight - paddinngBottom - littleRadius / 2));
+        pointControlls.add(new PointF(paddinngleft + littleRadius / 2, mHeight - paddinngBottom));
+
+        mPath.moveTo(pointDatas.get(0).x, pointDatas.get(0).y);
+        mPath.cubicTo(pointControlls.get(0).x, pointControlls.get(0).y, pointControlls.get(1).x, pointControlls.get(1).y, pointDatas.get(1).x, pointDatas.get(1).y);
+    }
+
+    public void drawBottomRightArc() {
+        List<PointF> pointDatas = new ArrayList<>();
+        List<PointF> pointControlls = new ArrayList<>();
+
+        pointDatas.add(new PointF(mWidth - paddinngRight - littleRadius, mHeight - paddinngBottom));
+        pointDatas.add(new PointF(mWidth - paddinngRight, mHeight - paddinngBottom - littleRadius));
+
+        pointControlls.add(new PointF(mWidth - paddinngRight - littleRadius / 2, mHeight - paddinngBottom));
+        pointControlls.add(new PointF(mWidth - paddinngRight, mHeight - paddinngBottom - littleRadius / 2));
+
+        mPath.moveTo(pointDatas.get(0).x, pointDatas.get(0).y);
+        mPath.cubicTo(pointControlls.get(0).x, pointControlls.get(0).y, pointControlls.get(1).x, pointControlls.get(1).y, pointDatas.get(1).x, pointDatas.get(1).y);
+    }
+
+    public void drawTopRightArc() {
+        List<PointF> pointDatas = new ArrayList<>();
+        List<PointF> pointControlls = new ArrayList<>();
+
+        pointDatas.add(new PointF(mWidth - paddinngRight, paddinngTop + littleRadius));
+        pointDatas.add(new PointF(mWidth - paddinngRight - littleRadius, paddinngTop));
+
+        pointControlls.add(new PointF(mWidth - paddinngRight, paddinngTop + littleRadius / 2));
+        pointControlls.add(new PointF(mWidth - paddinngRight - littleRadius / 2, paddinngTop));
+
+        mPath.moveTo(pointDatas.get(0).x, pointDatas.get(0).y);
+        mPath.cubicTo(pointControlls.get(0).x, pointControlls.get(0).y, pointControlls.get(1).x, pointControlls.get(1).y, pointDatas.get(1).x, pointDatas.get(1).y);
+    }
+
+
     public void drawCircle(Canvas canvas) {
         mPointDatas = new ArrayList<>();
         mPointControlls = new ArrayList<>();
@@ -136,16 +209,16 @@ public class MyView extends View {
         mCenterY = 0;
 //        mPointDatas.add(new PointF(mCenterX, mCenterY - mCircleRadius));
 //        mPointDatas.add(new PointF(mCenterX + mCircleRadius, mCenterY));
-        mPointDatas.add(new PointF(mCenterX + mCircleRadius, 50));
-        mPointDatas.add(new PointF(mCenterX, mCircleRadius + 50));
-        mPointDatas.add(new PointF(mCenterX - mCircleRadius, 50));
+        mPointDatas.add(new PointF(mCenterX + mCircleRadius, paddinngTop));
+        mPointDatas.add(new PointF(mCenterX, mCircleRadius + paddinngTop));
+        mPointDatas.add(new PointF(mCenterX - mCircleRadius, paddinngTop));
 
 
-        mPointControlls.add(new PointF(mCenterX + mCircleRadius, mCenterY + mCircleRadius / 2 + 50));
-        mPointControlls.add(new PointF(mCenterX + mCircleRadius / 2, mCenterY + mCircleRadius + 50));
+        mPointControlls.add(new PointF(mCenterX + mCircleRadius, mCenterY + mCircleRadius / 2 + paddinngTop));
+        mPointControlls.add(new PointF(mCenterX + mCircleRadius / 2, mCenterY + mCircleRadius + paddinngTop));
 
-        mPointControlls.add(new PointF(mCenterX - mCircleRadius / 2, mCenterY + mCircleRadius + 50));
-        mPointControlls.add(new PointF(mCenterX - mCircleRadius, mCenterY + mCircleRadius / 2 + 50));
+        mPointControlls.add(new PointF(mCenterX - mCircleRadius / 2, mCenterY + mCircleRadius + paddinngTop));
+        mPointControlls.add(new PointF(mCenterX - mCircleRadius, mCenterY + mCircleRadius / 2 + paddinngTop));
 
         //利用三阶贝塞尔曲线实现画圆
         mPath.moveTo(mPointDatas.get(0).x, mPointDatas.get(0).y);
