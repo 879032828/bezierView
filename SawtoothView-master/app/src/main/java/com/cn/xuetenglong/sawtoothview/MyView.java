@@ -20,16 +20,17 @@ public class MyView extends View {
     private List<PointF> mPointDatas; //放置四个数据点的集合
     private List<PointF> mPointControlls;//方式8个控制点的集合
 
-    private int mWidth;
-    private int mHeight;
-    private int mCenterX;//圆的中心坐标x
-    private int mCenterY;//圆的中心坐标y
-    private int mCircleRadius = 150;//圆的半径
-    private int littleRadius = 50;//小圆弧的半径
-    private int paddinngTop = 20;
-    private int paddinngBottom = 20;
-    private int paddinngleft = 20;
-    private int paddinngRight = 20;
+    private float ratio = 1.4f;
+    private float mWidth;
+    private float mHeight;
+    private float mCenterX;//圆的中心坐标x
+    private float mCenterY;//圆的中心坐标y
+    private float mCircleRadius = 110;//圆的半径
+    private float littleRadius = 50;//小圆弧的半径
+    private float paddinngTop = 20;
+    private float paddinngBottom = 20;
+    private float paddinngleft = 20;
+    private float paddinngRight = 20;
     Paint mPaint;
     Path mPath;
 
@@ -96,25 +97,28 @@ public class MyView extends View {
 
 
         drawCircle(canvas);
+
         mPath.lineTo(paddinngleft + littleRadius, paddinngTop);
 
         mPath.lineTo(0 + paddinngleft, 0 + paddinngTop + littleRadius);
         mPath.lineTo(0 + paddinngleft, mHeight - paddinngBottom - littleRadius);
 
         mPath.lineTo(0 + paddinngleft + littleRadius, mHeight - paddinngBottom);
-        mPath.lineTo(width - paddinngRight, mHeight - paddinngBottom);
-        mPath.lineTo(width - paddinngRight, 0 + paddinngTop);
+        mPath.lineTo(width - paddinngRight - littleRadius, mHeight - paddinngBottom);
+        mPath.lineTo(width - paddinngRight, mHeight - paddinngBottom - littleRadius);
+        mPath.lineTo(width - paddinngRight, 0 + paddinngTop + littleRadius);
+        mPath.lineTo(width - paddinngRight - littleRadius, 0 + paddinngTop);
         mPath.lineTo(halfWidth + mCircleRadius, 0 + paddinngTop);
         drawTopLeftArc();
         drawBottomLeftArc();
-
-//        drawBottomLeftArc();
-//        drawBottomRightArc();
-//        drawTopRightArc();
+        drawBottomRightArc();
+        drawTopRightArc();
+        drawLeftArc(canvas);
+        drawRightArc(canvas);
 
         mPaint.setDither(true);
         mPaint.setAlpha(125);
-        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setShadowLayer(30, 0, 0, Color.GRAY);
         canvas.drawPath(mPath, mPaint);
 
@@ -232,4 +236,35 @@ public class MyView extends View {
 //        //绘制
 //        canvas.drawPath(mPath, mPaint);
     }
+
+    public void drawLeftArc(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY);
+
+        PointF startPoint = new PointF(mWidth / 2 - 167 * 110/78, paddinngTop);
+        PointF endPoint = new PointF(307 * 110/78 + 10, 50 * 110/78);
+        PointF controlPoint = new PointF(mWidth / 2 - mCircleRadius, paddinngTop);
+
+        canvas.drawCircle(controlPoint.x,controlPoint.y,8,paint);
+
+
+        mPath.moveTo(startPoint.x, startPoint.y);
+        mPath.quadTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y);
+    }
+
+    public void drawRightArc(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY);
+
+        PointF startPoint = new PointF(mWidth / 2 + 167 * 110/78, paddinngTop);
+        PointF endPoint = new PointF(443 * 110/78 + 11, 50 * 110/78);
+        PointF controlPoint = new PointF(mWidth / 2 + mCircleRadius, paddinngTop);
+
+        canvas.drawCircle(controlPoint.x,controlPoint.y,8,paint);
+
+        mPath.moveTo(startPoint.x, startPoint.y);
+        mPath.quadTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y);
+    }
+
+
 }
